@@ -24,7 +24,6 @@ public class SymbolTable {
         top = symbolTable;
     }
 
-
     public static void pop() {
         top = stack.pop();
     }
@@ -44,6 +43,15 @@ public class SymbolTable {
         if (items.containsKey(item.getKey()))
             throw new ItemAlreadyExistsException();
         items.put(item.getKey(), item);
+    }
+
+    public void uniquePut(SymbolTableItem item) throws ItemAlreadyExistsException {
+        try {
+            this.get(item.getKey());
+            throw new ItemAlreadyExistsException();
+        } catch (ItemNotFoundException e) {
+            items.put(item.getKey(), item);
+        }
     }
 
 
