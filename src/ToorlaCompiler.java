@@ -14,7 +14,7 @@ public class ToorlaCompiler {
         Program toorlaASTCode = toorlaParser.program().mProgram;
 
         Visitor<Tree> semanticAnalyzer = new SemanticAnalyzer();
-        toorlaASTCode.accept( semanticAnalyzer );
+        toorlaASTCode = (Program) toorlaASTCode.accept( semanticAnalyzer ); // TODO: CHECK
 
         Visitor<Void> treePrinter = new TreePrinter();
         toorlaASTCode.accept( treePrinter );

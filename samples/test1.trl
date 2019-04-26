@@ -3,10 +3,26 @@ entry class Test :
 
     public field temp_length bool;
 
-    public function main() returns int :
+    public function main(a: int) returns int :
         var length = 2;
         var length1 = 3;
         var a = 3;
+        if (a == 2) begin
+            var a = 3;
+            var a = 3;
+        end
+        elif (a == 3) begin
+            var a = 3;
+            var a = 3;
+        end
+        else begin
+            var a = 3;
+            var a = 3;
+        end
+        while (a == 2) begin
+            var a = 3;
+            var a = 3;
+        end
         begin
             var a = 2;
             begin
