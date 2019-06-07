@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import toorla.ast.Program;
+import toorla.jasmin.JasminCompiler;
 import toorla.nameAnalyzer.NameAnalyzer;
 import toorla.typeChecker.TypeChecker;
 import toorla.visitor.ErrorReporter;
@@ -12,6 +13,7 @@ public class ToorlaCompiler {
         ToorlaParser toorlaParser = new ToorlaParser(tokenStream);
         Program toorlaASTCode = toorlaParser.program().mProgram;
         ErrorReporter errorReporter = new ErrorReporter();
+        JasminCompiler jasminCompiler = new JasminCompiler();
         NameAnalyzer nameAnalyzer = new NameAnalyzer(toorlaASTCode);
         nameAnalyzer.analyze();
         toorlaASTCode.accept(errorReporter);
@@ -20,6 +22,7 @@ public class ToorlaCompiler {
         int numOfErrors = toorlaASTCode.accept( errorReporter );
         if( numOfErrors > 0 )
             System.exit(1);
-        System.out.println("No error detected;");
+
+        System.out.println(toorlaASTCode.accept(jasminCompiler));
     }
 }
