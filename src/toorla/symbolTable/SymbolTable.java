@@ -18,14 +18,19 @@ public class SymbolTable {
     private static int mustBeUsedAfterDefCount = 0;
 
     private static Stack<SymbolTable> stack = new Stack<>();
-    private static Queue<SymbolTable> queue = new LinkedList<>();
+    private static ArrayList<SymbolTable> queue = new ArrayList<>();
+    private static int queueCounter = 0;
 
     public static SymbolTable top() {
         return top;
     }
 
+    public static void resetQueueCounter() {
+        queueCounter = 0;
+    }
+
     public static void pushFromQueue() {
-        push(queue.remove());
+        push(queue.get(queueCounter++));
     }
 
     public static void define()
@@ -46,7 +51,7 @@ public class SymbolTable {
         if (top != null)
             stack.push(top);
         top = symbolTable;
-        queue.offer(symbolTable);
+        queue.add(symbolTable);
     }
 
     public static void pop() {
