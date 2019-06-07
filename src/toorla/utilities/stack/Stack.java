@@ -24,4 +24,11 @@ public class Stack<E> {
         elements.remove(top + 1);
         return e;
     }
+
+    public E peek() {
+        if (top == -1)
+            return null;
+        E e = elements.get(top);
+        return e;
+    }
 }
