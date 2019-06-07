@@ -1,8 +1,8 @@
 class Yazdani inherits Ahmadhossein:
-    field x1 , y1 , z bool;
+    field x1 , y1 , z1 bool;
 
 
-    private function main( a : int ) returns int :
+    private function main1( a : int ) returns int :
         return 0;
     end
 
@@ -12,7 +12,7 @@ end
 
 
 entry class Ahmadhossein inherits Any1 :
-    field x , y , z int;
+    field x , y , z0 int;
 
     public function main() returns int :
         return 0;
@@ -21,7 +21,7 @@ entry class Ahmadhossein inherits Any1 :
 
 end
 
-class Any :
+class AnyPlus :
     field x int;
 
 

@@ -1,41 +1,44 @@
 entry class Test :
-    private field length , length , length1 , length1 , length int;
+    private field length0 , length01 , length1 , length11 , length12 int;
 
     public field temp_length bool;
 
-    public function main(a: int) returns int :
+    public function main0(a: int) returns int :
         var length = 2;
         var length1 = 3;
-        var a = 3;
+        var a0 = 3;
         if (a == 2) begin
             var a = 3;
-            var a = 3;
+            var a0 = 3;
         end
         elif (a == 3) begin
             var a = 3;
-            var a = 3;
+            var a0 = 3;
         end
         else begin
             var a = 3;
-            var a = 3;
+            var a0 = 3;
         end
         while (a == 2) begin
             var a = 3;
-            var a = 3;
+            var a0 = 3;
         end
         begin
             var a = 2;
             begin
                 var a1 = 2;
                 var b = 3;
-                var a1 = 3 , a4 = 4 , a1 = 5;
+                var a10 = 3 , a4 = 4 , a11 = 5;
             end
-            var a = true;
+            var a0 = true;
         end
         print( "this code has compile error" );
         return -1;
     end
 
-    public field temp_length int;
+    public function main() returns int :
+    end
+
+    public field temp_length0 int;
 
 end

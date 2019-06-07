@@ -13,7 +13,7 @@ class MyClass :
     function myMethod( a : string , b: bool , c : int[] ) returns int:
         print( "viva toorla!!!!!!!!!!!!!!!" );
         var a1 = 3 , a2 = 5 , a3 = 6;
-        var yazdani = new String();
+        var yazdani = "asd";
         var yazdaniBarikbin = 5414151;
         begin
             var tehran = 23;
@@ -31,7 +31,7 @@ class MyClass :
     function myMethod1( a : string , b: bool , c : int[] ) returns int:
             print( "viva toorla!!!!!!!!!!!!!!!" );
             var a1 = 3 , a2 = 5 , a3 = 6;
-            var yazdani = new String();
+            var yazdani = "asdf";
             var yazdaniBarikbin = 5414151;
             begin
                 var tehran = 23;
