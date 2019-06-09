@@ -270,6 +270,7 @@ public class TypeChecker extends Visitor<Void> {
         SymbolTable.pop();
         if( numOfEntryClasses <= 0 )
             program.addError( new NoEntryClassFound() );
+        SymbolTable.resetQueueCounter();
         return null;
     }
     @Override
