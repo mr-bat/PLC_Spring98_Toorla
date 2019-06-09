@@ -20,6 +20,7 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.typeChecker.ExpressionTypeExtractor;
+import toorla.types.Type;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
@@ -157,21 +158,29 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Block block) {
+        SymbolTable.pushFromQueue();
         for (Statement stmt : block.body)
             stmt.accept(this);
+        SymbolTable.pop();
         return "";
     }
 
     @Override
     public String visit(Conditional conditional) {
+        SymbolTable.pushFromQueue();
         conditional.getThenStatement().accept(this);
+        SymbolTable.pop();
+        SymbolTable.pushFromQueue();
         conditional.getElseStatement().accept(this);
+        SymbolTable.pop();
         return "";
     }
 
     @Override
     public String visit(While whileStat) {
+        SymbolTable.pushFromQueue();
         whileStat.body.accept(this);
+        SymbolTable.pop();
         return "";
     }
 
@@ -197,6 +206,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(LocalVarDef localVarDef) {
+        SymbolTable.define();
         System.out.println(localVarDef.getLocalVarName().getName() + " : " + localVarDef.getIndex());
         return "";
     }
@@ -221,9 +231,13 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(ClassDeclaration classDeclaration) {
+        SymbolTable.pushFromQueue();
+        expressionTypeExtractor.setCurrentClass(classDeclaration);
+
         for (ClassMemberDeclaration cmd : classDeclaration.getClassMembers()) {
             cmd.accept(this);
         }
+        SymbolTable.pop();
         return "";
     }
 
@@ -240,18 +254,23 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(ParameterDeclaration parameterDeclaration) {
+        SymbolTable.define();
         System.out.println(parameterDeclaration.getIdentifier().getName() + " : " + parameterDeclaration.getIndex());
         return "";
     }
 
     @Override
     public String visit(MethodDeclaration methodDeclaration) {
+        variableIndex = 1;
+        SymbolTable.reset();
+        SymbolTable.pushFromQueue();
         currentMethod = methodDeclaration;
         for(ParameterDeclaration parameter : methodDeclaration.getArgs() )
             parameter.accept( this);
         for (Statement s : methodDeclaration.getBody()) {
             s.accept(this);
         }
+        SymbolTable.pop();
         return "";
     }
 
