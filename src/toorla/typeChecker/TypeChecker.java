@@ -40,13 +40,14 @@ public class TypeChecker extends Visitor<Void> {
     private ExpressionTypeExtractor expressionTypeExtractor;
     private MethodDeclaration currentMethod;
     private int activeWhileStatCount;
-    private int numOfEntryClasses;
+    private int numOfEntryClasses, variableIndex;
     private Graph<String> classHierarchy;
 
     public TypeChecker(Graph<String> classHierarchy) {
         expressionTypeExtractor = new ExpressionTypeExtractor(classHierarchy);
         this.classHierarchy = classHierarchy;
         this.numOfEntryClasses = 0;
+        this.variableIndex = 0;
     }
 
     public static boolean isFirstSubTypeOfSecond(Type first, Type second, Graph<String> classHierarchy)
@@ -156,6 +157,7 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(LocalVarDef localVarDef) {
         try {
+            localVarDef.setIndex(variableIndex++);
             Type varType = localVarDef.getInitialValue().accept(expressionTypeExtractor);
             SymbolTable.define();
             LocalVariableSymbolTableItem variable = (LocalVariableSymbolTableItem) SymbolTable.top()
@@ -240,6 +242,7 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(MethodDeclaration methodDeclaration) {
+        variableIndex = 1;
         SymbolTable.reset();
         SymbolTable.pushFromQueue();
         currentMethod = methodDeclaration;
@@ -276,6 +279,7 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(ParameterDeclaration parameterDeclaration)
     {
+        parameterDeclaration.setIndex(variableIndex++);
         String typeName = parameterDeclaration.getType().toString();
         if( !classHierarchy.doesGraphContainNode( typeName ) && parameterDeclaration.getType() instanceof UserDefinedType)
             parameterDeclaration.addError(

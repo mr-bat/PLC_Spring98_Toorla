@@ -6,9 +6,19 @@ import toorla.types.Type;
 import toorla.visitor.IVisitor;
 
 public class ParameterDeclaration extends TypedVariableDeclaration {
+    private int index;
+
     public ParameterDeclaration(Identifier name, Type type) {
         this.identifier = name;
         this.type = type;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     @Override

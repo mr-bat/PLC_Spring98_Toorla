@@ -3,6 +3,7 @@ package toorla.jasmin;
 import toorla.ast.Program;
 import toorla.ast.declaration.classDecs.ClassDeclaration;
 import toorla.ast.declaration.classDecs.EntryClassDeclaration;
+import toorla.ast.declaration.classDecs.classMembersDecs.ClassMemberDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.FieldDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.MethodDeclaration;
 import toorla.ast.declaration.localVarDecs.ParameterDeclaration;
@@ -17,216 +18,253 @@ import toorla.ast.statement.*;
 import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
+import toorla.symbolTable.SymbolTable;
+import toorla.typeChecker.ExpressionTypeExtractor;
+import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
 public class JasminCompiler extends Visitor<String> {
+    private ExpressionTypeExtractor expressionTypeExtractor;
+    private MethodDeclaration currentMethod;
+    private int activeWhileStatCount;
+    private int numOfEntryClasses, variableIndex;
+    private Graph<String> classHierarchy;
+
     @Override
     public String visit(Plus plusExpr) {
-        return super.visit(plusExpr);
+        return "";
     }
 
     @Override
     public String visit(Minus minusExpr) {
-        return super.visit(minusExpr);
+        return "";
     }
 
     @Override
     public String visit(Times timesExpr) {
-        return super.visit(timesExpr);
+        return "";
     }
 
     @Override
     public String visit(Division divExpr) {
-        return super.visit(divExpr);
+        return "";
     }
 
     @Override
     public String visit(Modulo moduloExpr) {
-        return super.visit(moduloExpr);
+        return "";
     }
 
     @Override
     public String visit(Equals equalsExpr) {
-        return super.visit(equalsExpr);
+        return "";
     }
 
     @Override
     public String visit(GreaterThan gtExpr) {
-        return super.visit(gtExpr);
+        return "";
     }
 
     @Override
     public String visit(LessThan lessThanExpr) {
-        return super.visit(lessThanExpr);
+        return "";
     }
 
     @Override
     public String visit(And andExpr) {
-        return super.visit(andExpr);
+        return "";
     }
 
     @Override
     public String visit(Or orExpr) {
-        return super.visit(orExpr);
+        return "";
     }
 
     @Override
     public String visit(Neg negExpr) {
-        return super.visit(negExpr);
+        return "";
     }
 
     @Override
     public String visit(Not notExpr) {
-        return super.visit(notExpr);
+        return "";
     }
 
     @Override
     public String visit(MethodCall methodCall) {
-        return super.visit(methodCall);
+        return "";
     }
 
     @Override
     public String visit(Identifier identifier) {
-        return super.visit(identifier);
+        return "";
     }
 
     @Override
     public String visit(Self self) {
-        return super.visit(self);
+        return "";
     }
 
     @Override
     public String visit(IntValue intValue) {
-        return super.visit(intValue);
+        return "";
     }
 
     @Override
     public String visit(NewArray newArray) {
-        return super.visit(newArray);
+        return "";
     }
 
     @Override
     public String visit(BoolValue booleanValue) {
-        return super.visit(booleanValue);
+        return "";
     }
 
     @Override
     public String visit(StringValue stringValue) {
-        return super.visit(stringValue);
+        return "";
     }
 
     @Override
     public String visit(NewClassInstance newClassInstance) {
-        return super.visit(newClassInstance);
+        return "";
     }
 
     @Override
     public String visit(FieldCall fieldCall) {
-        return super.visit(fieldCall);
+        return "";
     }
 
     @Override
     public String visit(ArrayCall arrayCall) {
-        return super.visit(arrayCall);
+        return "";
     }
 
     @Override
     public String visit(NotEquals notEquals) {
-        return super.visit(notEquals);
+        return "";
     }
 
     @Override
     public String visit(PrintLine printStat) {
-        return super.visit(printStat);
+        return "";
     }
 
     @Override
     public String visit(Assign assignStat) {
-        return super.visit(assignStat);
+        return "";
     }
 
     @Override
     public String visit(Block block) {
-        return super.visit(block);
+        for (Statement stmt : block.body)
+            stmt.accept(this);
+        return "";
     }
 
     @Override
     public String visit(Conditional conditional) {
-        return super.visit(conditional);
+        conditional.getThenStatement().accept(this);
+        conditional.getElseStatement().accept(this);
+        return "";
     }
 
     @Override
     public String visit(While whileStat) {
-        return super.visit(whileStat);
+        whileStat.body.accept(this);
+        return "";
     }
 
     @Override
     public String visit(Return returnStat) {
-        return super.visit(returnStat);
+        return "";
     }
 
     @Override
     public String visit(Break breakStat) {
-        return super.visit(breakStat);
+        return "";
     }
 
     @Override
     public String visit(Continue continueStat) {
-        return super.visit(continueStat);
+        return "";
     }
 
     @Override
     public String visit(Skip skip) {
-        return super.visit(skip);
+        return "";
     }
 
     @Override
     public String visit(LocalVarDef localVarDef) {
-        return super.visit(localVarDef);
-    }
-
-    @Override
-    public String visit(IncStatement incStatement) {
-        return super.visit(incStatement);
-    }
-
-    @Override
-    public String visit(DecStatement decStatement) {
-        return super.visit(decStatement);
-    }
-
-    @Override
-    public String visit(ClassDeclaration classDeclaration) {
-        return super.visit(classDeclaration);
-    }
-
-    @Override
-    public String visit(EntryClassDeclaration entryClassDeclaration) {
-        return super.visit(entryClassDeclaration);
-    }
-
-    @Override
-    public String visit(FieldDeclaration fieldDeclaration) {
-        return super.visit(fieldDeclaration);
-    }
-
-    @Override
-    public String visit(ParameterDeclaration parameterDeclaration) {
-        return super.visit(parameterDeclaration);
-    }
-
-    @Override
-    public String visit(MethodDeclaration methodDeclaration) {
-        return super.visit(methodDeclaration);
+        System.out.println(localVarDef.getLocalVarName().getName() + " : " + localVarDef.getIndex());
+        return "";
     }
 
     @Override
     public String visit(LocalVarsDefinitions localVarsDefinitions) {
-        return super.visit(localVarsDefinitions);
+        for (LocalVarDef lvd : localVarsDefinitions.getVarDefinitions()) {
+            lvd.accept(this);
+        }
+        return "";
+    }
+
+    @Override
+    public String visit(IncStatement incStatement) {
+        return "";
+    }
+
+    @Override
+    public String visit(DecStatement decStatement) {
+        return "";
+    }
+
+    @Override
+    public String visit(ClassDeclaration classDeclaration) {
+        for (ClassMemberDeclaration cmd : classDeclaration.getClassMembers()) {
+            cmd.accept(this);
+        }
+        return "";
+    }
+
+    @Override
+    public String visit(EntryClassDeclaration entryClassDeclaration) {
+        this.visit( (ClassDeclaration) entryClassDeclaration);
+        return "";
+    }
+
+    @Override
+    public String visit(FieldDeclaration fieldDeclaration) {
+        return "";
+    }
+
+    @Override
+    public String visit(ParameterDeclaration parameterDeclaration) {
+        System.out.println(parameterDeclaration.getIdentifier().getName() + " : " + parameterDeclaration.getIndex());
+        return "";
+    }
+
+    @Override
+    public String visit(MethodDeclaration methodDeclaration) {
+        currentMethod = methodDeclaration;
+        for(ParameterDeclaration parameter : methodDeclaration.getArgs() )
+            parameter.accept( this);
+        for (Statement s : methodDeclaration.getBody()) {
+            s.accept(this);
+        }
+        return "";
     }
 
     @Override
     public String visit(Program program) {
-        return super.visit(program);
+        currentMethod = null;
+        activeWhileStatCount = 0;
+        SymbolTable.pushFromQueue();
+        for( ClassDeclaration classDeclaration : program.getClasses() )
+            classDeclaration.accept(this);
+        SymbolTable.pop();
+        SymbolTable.resetQueueCounter();
+
+        return "";
     }
 }
