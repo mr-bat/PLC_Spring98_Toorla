@@ -13,11 +13,11 @@ public class ToorlaCompiler {
         ToorlaParser toorlaParser = new ToorlaParser(tokenStream);
         Program toorlaASTCode = toorlaParser.program().mProgram;
         ErrorReporter errorReporter = new ErrorReporter();
-        JasminCompiler jasminCompiler = new JasminCompiler();
         NameAnalyzer nameAnalyzer = new NameAnalyzer(toorlaASTCode);
         nameAnalyzer.analyze();
         toorlaASTCode.accept(errorReporter);
         TypeChecker typeChecker = new TypeChecker(nameAnalyzer.getClassHierarchy());
+        JasminCompiler jasminCompiler = new JasminCompiler(nameAnalyzer.getClassHierarchy());
         toorlaASTCode.accept(typeChecker);
         int numOfErrors = toorlaASTCode.accept( errorReporter );
         if( numOfErrors > 0 )

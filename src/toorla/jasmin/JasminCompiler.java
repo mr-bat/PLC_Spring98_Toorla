@@ -18,18 +18,26 @@ import toorla.ast.statement.*;
 import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
+import toorla.jasmin.utils.JGenrator;
 import toorla.symbolTable.SymbolTable;
 import toorla.typeChecker.ExpressionTypeExtractor;
 import toorla.types.Type;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
+import java.text.MessageFormat;
+
+import static java.text.MessageFormat.format;
+
 public class JasminCompiler extends Visitor<String> {
     private ExpressionTypeExtractor expressionTypeExtractor;
     private MethodDeclaration currentMethod;
-    private int activeWhileStatCount;
-    private int numOfEntryClasses, variableIndex;
     private Graph<String> classHierarchy;
+
+    public JasminCompiler(Graph<String> classHierarchy) {
+        this.expressionTypeExtractor = new ExpressionTypeExtractor(classHierarchy);
+        this.classHierarchy = classHierarchy;
+    }
 
     @Override
     public String visit(Plus plusExpr) {
@@ -207,7 +215,6 @@ public class JasminCompiler extends Visitor<String> {
     @Override
     public String visit(LocalVarDef localVarDef) {
         SymbolTable.define();
-        System.out.println(localVarDef.getLocalVarName().getName() + " : " + localVarDef.getIndex());
         return "";
     }
 
@@ -231,20 +238,26 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(ClassDeclaration classDeclaration) {
+        StringBuilder result = new StringBuilder(format(".class public {0}\n", classDeclaration.getName().getName()));
+        String parentName = classDeclaration.getParentName().getName() == null ?
+                "java/lang/Object" :
+                classDeclaration.getParentName().getName();
+        result.append(format(".super {0}\n", classDeclaration.getParentName().getName()));
+
         SymbolTable.pushFromQueue();
         expressionTypeExtractor.setCurrentClass(classDeclaration);
 
         for (ClassMemberDeclaration cmd : classDeclaration.getClassMembers()) {
-            cmd.accept(this);
+            result.append(cmd.accept(this));
         }
         SymbolTable.pop();
-        return "";
+        result.append(JGenrator.comment(format("end of class {0}", classDeclaration.getName().getName())));
+        return String.valueOf(result);
     }
 
     @Override
     public String visit(EntryClassDeclaration entryClassDeclaration) {
-        this.visit( (ClassDeclaration) entryClassDeclaration);
-        return "";
+        return this.visit( (ClassDeclaration) entryClassDeclaration);
     }
 
     @Override
@@ -255,13 +268,11 @@ public class JasminCompiler extends Visitor<String> {
     @Override
     public String visit(ParameterDeclaration parameterDeclaration) {
         SymbolTable.define();
-        System.out.println(parameterDeclaration.getIdentifier().getName() + " : " + parameterDeclaration.getIndex());
         return "";
     }
 
     @Override
     public String visit(MethodDeclaration methodDeclaration) {
-        variableIndex = 1;
         SymbolTable.reset();
         SymbolTable.pushFromQueue();
         currentMethod = methodDeclaration;
@@ -276,14 +287,14 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Program program) {
+        StringBuilder result = new StringBuilder();
         currentMethod = null;
-        activeWhileStatCount = 0;
         SymbolTable.pushFromQueue();
         for( ClassDeclaration classDeclaration : program.getClasses() )
-            classDeclaration.accept(this);
+            result.append(classDeclaration.accept(this));
         SymbolTable.pop();
         SymbolTable.resetQueueCounter();
 
-        return "";
+        return result.toString();
     }
 }
