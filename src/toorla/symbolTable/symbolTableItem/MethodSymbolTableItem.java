@@ -1,5 +1,6 @@
 package toorla.symbolTable.symbolTableItem;
 
+import toorla.ast.declaration.classDecs.ClassDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.AccessModifier;
 import toorla.types.Type;
 
@@ -9,14 +10,20 @@ public class MethodSymbolTableItem extends SymbolTableItem {
     public static final String methodModifier = "method_";
     private Type returnType;
     private List<Type> argumentsTypes;
+    private ClassDeclaration classDeclaration;
     private AccessModifier accessModifier;
 
     public MethodSymbolTableItem(String name, Type returnType, List<Type> argumentsTypes,
-                                 AccessModifier accessModifier) {
+                                 AccessModifier accessModifier, ClassDeclaration classDeclaration) {
         this.returnType = returnType;
         this.argumentsTypes = argumentsTypes;
         this.name = name;
         this.accessModifier = accessModifier;
+        this.classDeclaration = classDeclaration;
+    }
+
+    public ClassDeclaration getClassDeclaration() {
+        return classDeclaration;
     }
 
     @Override

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 public class NameCollectionPass extends Visitor<Void> implements INameAnalyzingPass<Void> {
     private int newLocalVarIndex;// refreshed in start of every method
     private int classCounter = 0;
+    private ClassDeclaration classDeclaration = null;
 
     @Override
     public Void visit(Block block) {
@@ -74,6 +75,7 @@ public class NameCollectionPass extends Visitor<Void> implements INameAnalyzingP
 
     @Override
     public Void visit(ClassDeclaration classDeclaration) {
+        this.classDeclaration = classDeclaration;
         classCounter++;
         ClassSymbolTableItem thisClass = new ClassSymbolTableItem(classDeclaration.getName().getName());
         SymbolTable.push(new SymbolTable(SymbolTable.top()));
@@ -103,7 +105,7 @@ public class NameCollectionPass extends Visitor<Void> implements INameAnalyzingP
         if (!fieldDeclaration.getIdentifier().getName().equals("length")) {
             try {
                 SymbolTable.top().put(new FieldSymbolTableItem(fieldDeclaration.getIdentifier().getName(),
-                        fieldDeclaration.getAccessModifier(), fieldDeclaration.getType()));
+                        fieldDeclaration.getAccessModifier(), fieldDeclaration.getType(), classDeclaration));
             } catch (ItemAlreadyExistsException e) {
                 FieldRedefinitionException ee = new FieldRedefinitionException(
                         fieldDeclaration.getIdentifier().getName(), fieldDeclaration.line, fieldDeclaration.col);
@@ -144,7 +146,7 @@ public class NameCollectionPass extends Visitor<Void> implements INameAnalyzingP
             for (ParameterDeclaration arg : methodDeclaration.getArgs())
                 argumentsTypes.add(arg.getType());
             SymbolTable.top().put(new MethodSymbolTableItem(methodDeclaration.getName().getName(),
-                    methodDeclaration.getReturnType(), argumentsTypes, methodDeclaration.getAccessModifier()));
+                    methodDeclaration.getReturnType(), argumentsTypes, methodDeclaration.getAccessModifier(), classDeclaration));
         } catch (ItemAlreadyExistsException e) {
             MethodRedefinitionException ee = new MethodRedefinitionException(methodDeclaration.getName().getName(),
                     methodDeclaration.getName().line, methodDeclaration.getName().col);
