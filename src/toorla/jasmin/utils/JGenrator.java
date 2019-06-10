@@ -3,6 +3,8 @@ package toorla.jasmin.utils;
 import toorla.ast.expression.Expression;
 import toorla.ast.expression.FieldCall;
 import toorla.ast.expression.Identifier;
+import toorla.ast.expression.binaryExpression.BinaryExpression;
+import toorla.jasmin.JasminCompiler;
 import toorla.symbolTable.symbolTableItem.SymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
@@ -16,6 +18,8 @@ import toorla.types.singleType.UserDefinedType;
 import static java.text.MessageFormat.format;
 
 public class JGenrator {
+    private static int nextLabel = 0;
+
     public static String comment(String s) {
         return format("; {0}\n", s);
     }
@@ -55,5 +59,13 @@ public class JGenrator {
             return generated.replaceFirst("load", "store");
 
         throw new RuntimeException("Invalid change");
+    }
+
+    public static String genCondition(String type) {
+        String result = "if_icmp" + type + " condition_" + nextLabel + "\n";
+        result += "pop\niconst_1\n";
+        result += nextLabel + ": \n";
+
+        return result;
     }
 }

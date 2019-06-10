@@ -34,8 +34,20 @@ public class JasminCompiler extends Visitor<String> {
     private ExpressionTypeExtractor expressionTypeExtractor;
     private ClassDeclaration currentClass = null;
     private MethodDeclaration currentMethod = null;
-    private int whileCounter = 0, ifCounter = 0;
+    private int whileCounter = 0, ifCounter = 0, tmpCounter = 0;
     private Graph<String> classHierarchy;
+
+    public String genShortCircuit(BinaryExpression binExp, String cmpType, int shortCircuitVal) {
+        int scopeId = tmpCounter++;
+        String result = "iconst_" + shortCircuitVal + "\n";
+        result += binExp.getLhs().accept(this);
+        result += "if" + cmpType + " " + scopeId + "\n";
+        result += binExp.getRhs().accept(this);
+        result += "if" + cmpType + " " + "short_circuit_" + scopeId + "\n";
+        result += "pop\n" + "iconst_" + (1 - shortCircuitVal) + "\n";
+        result += "short_circuit_" + scopeId + ":\n";
+        return result;
+    }
 
     private String generateBeginLabel(int scopeCounter) {
         return currentMethod.getName().getName() + "_" + currentClass.getName().getName() + "_" + scopeCounter + "_begin";
@@ -84,33 +96,40 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(GreaterThan gtExpr) {
-        return "";
+        String result = "iconst_0\n";
+        result += gtExpr.getLhs().accept(this);
+        result += gtExpr.getRhs().accept(this);
+        result += JGenrator.genCondition("gt");
+        return result;
     }
 
     @Override
     public String visit(LessThan lessThanExpr) {
-        return "";
+        String result = "iconst_0\n";
+        result += lessThanExpr.getLhs().accept(this);
+        result += lessThanExpr.getRhs().accept(this);
+        result += JGenrator.genCondition("lt");
+        return result;
     }
 
     @Override
     public String visit(And andExpr) {
-        return andExpr.getLhs().accept(this) + andExpr.getRhs().accept(this) + "iand\n";
+        return genShortCircuit(andExpr, "eq", 0);
     }
 
     @Override
     public String visit(Or orExpr) {
-        return orExpr.getLhs().accept(this) + orExpr.getRhs().accept(this) + "ior\n";
-
+        return genShortCircuit(orExpr, "ne", 1);
     }
 
     @Override
     public String visit(Neg negExpr) {
-        return "";
+        return negExpr.accept(this) + "ineg\n";
     }
 
     @Override
     public String visit(Not notExpr) {
-        return "";
+        return "iconst_1\n" + notExpr.accept(this) + "isub\n";
     }
 
     @Override
@@ -130,7 +149,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(IntValue intValue) {
-        return "ldc " + intValue.getConstant();
+        return "ldc " + intValue.getConstant() + "\n";
     }
 
     @Override
@@ -140,12 +159,12 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(BoolValue booleanValue) {
-        return "ldc " + (booleanValue.isConstant() ? "1" : "0");
+        return "ldc " + (booleanValue.isConstant() ? "1" : "0") + "\n";
     }
 
     @Override
     public String visit(StringValue stringValue) {
-        return "ldc " + stringValue.getConstant();
+        return "ldc " + stringValue.getConstant() + "\n";
     }
 
     @Override
