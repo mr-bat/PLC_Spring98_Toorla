@@ -42,27 +42,27 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Plus plusExpr) {
-        return "";
+        return plusExpr.getLhs().accept(this) + plusExpr.getRhs().accept(this) + "iadd\n";
     }
 
     @Override
     public String visit(Minus minusExpr) {
-        return "";
+        return minusExpr.getLhs().accept(this) + minusExpr.getRhs().accept(this) + "isub\n";
     }
 
     @Override
     public String visit(Times timesExpr) {
-        return "";
+        return timesExpr.getLhs().accept(this) + timesExpr.getRhs().accept(this) + "imul\n";
     }
 
     @Override
     public String visit(Division divExpr) {
-        return "";
+        return divExpr.getLhs().accept(this) + divExpr.getRhs().accept(this) + "idiv\n";
     }
 
     @Override
     public String visit(Modulo moduloExpr) {
-        return "";
+        return moduloExpr.getLhs().accept(this) + moduloExpr.getRhs().accept(this) + "irem\n";
     }
 
     @Override
@@ -82,12 +82,13 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(And andExpr) {
-        return "";
+        return andExpr.getLhs().accept(this) + andExpr.getRhs().accept(this) + "iand\n";
     }
 
     @Override
     public String visit(Or orExpr) {
-        return "";
+        return orExpr.getLhs().accept(this) + orExpr.getRhs().accept(this) + "ior\n";
+
     }
 
     @Override
