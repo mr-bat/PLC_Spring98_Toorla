@@ -50,13 +50,13 @@ public class JasminCompiler extends Visitor<String> {
     }
 
     private String generateBeginLabel(int scopeCounter) {
-        return currentMethod.getName().getName() + "_" + currentClass.getName().getName() + "_" + scopeCounter + "_begin";
+        return currentClass.getName().getName() + "_" + currentMethod.getName().getName() + "_" + scopeCounter + "_begin";
     }
     private String generateElseLabel(int scopeCounter) {
-        return currentMethod.getName().getName() + "_" + currentClass.getName().getName() + "_" + scopeCounter + "_else";
+        return currentClass.getName().getName() + "_" + currentMethod.getName().getName() + "_" + scopeCounter + "_else";
     }
     private String generateEndLabel(int scopeCounter) {
-        return currentMethod.getName().getName() + "_" + currentClass.getName().getName() + "_" + scopeCounter + "_end";
+        return currentClass.getName().getName() + "_" + currentMethod.getName().getName() + "_" + scopeCounter + "_end";
     }
 
     public JasminCompiler(Graph<String> classHierarchy) {
@@ -124,12 +124,12 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Neg negExpr) {
-        return negExpr.accept(this) + "ineg\n";
+        return negExpr.getExpr().accept(this) + "ineg\n";
     }
 
     @Override
     public String visit(Not notExpr) {
-        return "iconst_1\n" + notExpr.accept(this) + "isub\n";
+        return "iconst_1\n" + notExpr.getExpr().accept(this) + "isub\n";
     }
 
     @Override
