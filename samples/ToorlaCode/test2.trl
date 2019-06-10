@@ -15,6 +15,7 @@ entry class Ahmadhossein inherits Any1 :
     field x , y , z0 int;
 
     public function main() returns int :
+        x = 2;
         return 0;
     end
 
@@ -29,5 +30,5 @@ end
 
 
 class Any1:
-    field z int;
+    public field z int;
 end

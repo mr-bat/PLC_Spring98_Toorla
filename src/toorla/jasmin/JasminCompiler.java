@@ -21,11 +21,8 @@ import toorla.ast.statement.returnStatement.Return;
 import toorla.jasmin.utils.JGenrator;
 import toorla.symbolTable.SymbolTable;
 import toorla.typeChecker.ExpressionTypeExtractor;
-import toorla.types.Type;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
-
-import java.text.MessageFormat;
 
 import static java.text.MessageFormat.format;
 
@@ -108,7 +105,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Identifier identifier) {
-        return JGenrator.loadLVal(identifier);
+        return JGenrator.loadLVal(SymbolTable.top().get("var_" + identifier.getName()), identifier);
     }
 
     @Override
@@ -143,7 +140,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(FieldCall fieldCall) {
-        return JGenrator.loadLVal(fieldCall);
+        return JGenrator.loadLVal(SymbolTable.top().get("var_" + fieldCall.getField().getName()), fieldCall);
     }
 
     @Override
@@ -164,8 +161,7 @@ public class JasminCompiler extends Visitor<String> {
     @Override
     public String visit(Assign assignStat) {
         String result = assignStat.getRvalue().accept(this) + '\n';
-        result += assignStat.getLvalue().accept(this) + "\n";
-        result += JGenrator.storeVal(assignStat.getLvalue()) + "\n";
+        result += JGenrator.changeLoadToStore(assignStat.getLvalue().accept(this)) + "\n";
         return result;
     }
 
