@@ -5,6 +5,7 @@ import toorla.ast.expression.FieldCall;
 import toorla.ast.expression.Identifier;
 import toorla.symbolTable.symbolTableItem.SymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.types.Type;
 import toorla.types.arrayType.ArrayType;
 import toorla.types.singleType.BoolType;
@@ -37,12 +38,12 @@ public class JGenrator {
     public static String loadLVal(SymbolTableItem symbolTableItem, Expression exp) {
         if (!exp.isLvalue())
             throw new RuntimeException("loadLVal needs l-value");
-        if (exp instanceof FieldCall) {
+        if (symbolTableItem instanceof FieldSymbolTableItem) {
             FieldSymbolTableItem fieldItem = (FieldSymbolTableItem) symbolTableItem;
-            return format("getfield {0}\n", format("{0}/{1} {2}", fieldItem.getClassDeclaration().getName(), fieldItem.getName(), genType(fieldItem.getType())));
+            return format("getfield {0}/{1} {2}\n", fieldItem.getClassDeclaration().getName().getName(), fieldItem.getName(), genType(fieldItem.getType()));
         }
-        if (exp instanceof Identifier)
-            return "iload " + ((Identifier) exp).getIndex() + "\n";
+        if (symbolTableItem instanceof LocalVariableSymbolTableItem)
+            return "iload " + ((LocalVariableSymbolTableItem) symbolTableItem).getIndex() + "\n";
 
         throw new RuntimeException("Invalid state");
     }

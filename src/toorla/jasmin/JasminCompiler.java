@@ -238,6 +238,7 @@ public class JasminCompiler extends Visitor<String> {
     public String visit(IncStatement incStatement) {
         String result = incStatement.getOperand().accept(this);
         result += "ldc 1\n";
+        result += "iadd\n";
         result += JGenrator.changeLoadToStore(incStatement.getOperand().accept(this));
 //        result += decStatement.getOperand().accept(this); //TODO: ++ returns?
         return result;
@@ -246,7 +247,8 @@ public class JasminCompiler extends Visitor<String> {
     @Override
     public String visit(DecStatement decStatement) {
         String result = decStatement.getOperand().accept(this);
-        result += "ldc -1\n";
+        result += "ldc 1\n";
+        result += "isub\n";
         result += JGenrator.changeLoadToStore(decStatement.getOperand().accept(this));
 //        result += decStatement.getOperand().accept(this); //TODO: -- returns?
         return result;

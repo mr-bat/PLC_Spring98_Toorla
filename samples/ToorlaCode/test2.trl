@@ -15,7 +15,11 @@ entry class Ahmadhossein inherits Any1 :
     field x , y , z0 int;
 
     public function main() returns int :
+        var y3 = 1;
+        y3 = 2;
         x = 2;
+        x++;
+        x--;
         return 0;
     end
 
