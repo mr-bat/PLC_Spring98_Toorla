@@ -167,11 +167,12 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Block block) {
+        StringBuilder result = new StringBuilder();
         SymbolTable.pushFromQueue();
         for (Statement stmt : block.body)
-            stmt.accept(this);
+            result.append(stmt.accept(this));
         SymbolTable.pop();
-        return "";
+        return result.toString();
     }
 
     @Override
