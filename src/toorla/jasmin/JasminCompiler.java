@@ -32,8 +32,20 @@ public class JasminCompiler extends Visitor<String> {
     private static final int STACK_SIZE = 64;
     private static final int LOCALS_SIZE = 64;
     private ExpressionTypeExtractor expressionTypeExtractor;
-    private MethodDeclaration currentMethod;
+    private ClassDeclaration currentClass = null;
+    private MethodDeclaration currentMethod = null;
+    private int whileCounter = 0, ifCounter = 0;
     private Graph<String> classHierarchy;
+
+    private String generateBeginLabel(int scopeCounter) {
+        return currentMethod.getName().getName() + "_" + currentClass.getName().getName() + "_" + scopeCounter + "_begin";
+    }
+    private String generateElseLabel(int scopeCounter) {
+        return currentMethod.getName().getName() + "_" + currentClass.getName().getName() + "_" + scopeCounter + "_else";
+    }
+    private String generateEndLabel(int scopeCounter) {
+        return currentMethod.getName().getName() + "_" + currentClass.getName().getName() + "_" + scopeCounter + "_end";
+    }
 
     public JasminCompiler(Graph<String> classHierarchy) {
         this.expressionTypeExtractor = new ExpressionTypeExtractor(classHierarchy);
@@ -180,21 +192,36 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Conditional conditional) {
+        int scopeId = ifCounter++;
+
+        String result = conditional.getCondition().accept(this);
         SymbolTable.pushFromQueue();
-        conditional.getThenStatement().accept(this);
+        result += conditional.getThenStatement().accept(this);
         SymbolTable.pop();
+        result += "goto " + generateEndLabel(scopeId) + "\n";
+
+        result += generateElseLabel(scopeId) + ":\n";
         SymbolTable.pushFromQueue();
-        conditional.getElseStatement().accept(this);
+        result += conditional.getElseStatement().accept(this);
         SymbolTable.pop();
-        return "";
+        result += generateEndLabel(scopeId) + ":\n";
+
+        return result;
     }
 
     @Override
     public String visit(While whileStat) {
+        int scopeId = whileCounter++;
+
+        String result = generateBeginLabel(scopeId) + ":\n";
+        result += whileStat.expr.accept(this);
         SymbolTable.pushFromQueue();
-        whileStat.body.accept(this);
+        result += whileStat.body.accept(this);
         SymbolTable.pop();
-        return "";
+        result += "goto " + generateBeginLabel(scopeId) + "\n";
+        result += generateElseLabel(scopeId) + ":\n";
+
+        return result;
     }
 
     @Override
@@ -207,12 +234,12 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Break breakStat) {
-        return "";
+        return "goto " + generateElseLabel(whileCounter - 1) + "\n";
     }
 
     @Override
     public String visit(Continue continueStat) {
-        return "";
+        return "goto " + generateBeginLabel(whileCounter - 1) + "\n";
     }
 
     @Override
@@ -257,6 +284,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(ClassDeclaration classDeclaration) {
+        this.currentClass = classDeclaration;
         StringBuilder result = new StringBuilder(format(".class public {0}\n", classDeclaration.getName().getName()));
         String parentName = classDeclaration.getParentName().getName() == null ?
                 "java/lang/Object" :
