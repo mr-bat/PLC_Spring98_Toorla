@@ -3,7 +3,6 @@ package toorla.jasmin.utils;
 import toorla.ast.expression.Expression;
 import toorla.ast.expression.FieldCall;
 import toorla.ast.expression.Identifier;
-import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.symbolTableItem.SymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.types.Type;
@@ -12,8 +11,6 @@ import toorla.types.singleType.BoolType;
 import toorla.types.singleType.IntType;
 import toorla.types.singleType.StringType;
 import toorla.types.singleType.UserDefinedType;
-
-import java.text.MessageFormat;
 
 import static java.text.MessageFormat.format;
 
@@ -45,7 +42,7 @@ public class JGenrator {
             return format("getfield {0}\n", format("{0}/{1} {2}", fieldItem.getClassDeclaration().getName(), fieldItem.getName(), genType(fieldItem.getType())));
         }
         if (exp instanceof Identifier)
-            return "iload " + ((Identifier) exp).getIndex();
+            return "iload " + ((Identifier) exp).getIndex() + "\n";
 
         throw new RuntimeException("Invalid state");
     }

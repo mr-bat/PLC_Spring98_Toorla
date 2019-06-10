@@ -21,6 +21,8 @@ import toorla.ast.statement.returnStatement.Return;
 import toorla.jasmin.utils.JGenrator;
 import toorla.symbolTable.SymbolTable;
 import toorla.typeChecker.ExpressionTypeExtractor;
+import toorla.types.arrayType.ArrayType;
+import toorla.types.singleType.UserDefinedType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
@@ -161,7 +163,7 @@ public class JasminCompiler extends Visitor<String> {
     @Override
     public String visit(Assign assignStat) {
         String result = assignStat.getRvalue().accept(this) + '\n';
-        result += JGenrator.changeLoadToStore(assignStat.getLvalue().accept(this)) + "\n";
+        result += JGenrator.changeLoadToStore(assignStat.getLvalue().accept(this));
         return result;
     }
 
@@ -196,7 +198,10 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Return returnStat) {
-        return "";
+        if (returnStat.getReturnedExpr().isLvalue()) {
+            return returnStat.getReturnedExpr().accept(this) + "\nareturn\n";
+        }
+        return returnStat.getReturnedExpr().accept(this) + "\nireturn\n";
     }
 
     @Override
@@ -231,14 +236,20 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(IncStatement incStatement) {
-        return "";
+        String result = incStatement.getOperand().accept(this);
+        result += "ldc 1\n";
+        result += JGenrator.changeLoadToStore(incStatement.getOperand().accept(this));
+//        result += decStatement.getOperand().accept(this); //TODO: ++ returns?
+        return result;
     }
 
     @Override
     public String visit(DecStatement decStatement) {
-        String result = "";
-
-        return "";
+        String result = decStatement.getOperand().accept(this);
+        result += "ldc -1\n";
+        result += JGenrator.changeLoadToStore(decStatement.getOperand().accept(this));
+//        result += decStatement.getOperand().accept(this); //TODO: -- returns?
+        return result;
     }
 
     @Override
