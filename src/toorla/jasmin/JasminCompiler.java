@@ -108,7 +108,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Identifier identifier) {
-        return "";
+        return JGenrator.loadLVal(identifier);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(IntValue intValue) {
-        return "";
+        return "ldc " + intValue.getConstant();
     }
 
     @Override
@@ -128,12 +128,12 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(BoolValue booleanValue) {
-        return "";
+        return "ldc " + (booleanValue.isConstant() ? "1" : "0");
     }
 
     @Override
     public String visit(StringValue stringValue) {
-        return "";
+        return "ldc " + stringValue.getConstant();
     }
 
     @Override
@@ -143,7 +143,7 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(FieldCall fieldCall) {
-        return "";
+        return JGenrator.loadLVal(fieldCall);
     }
 
     @Override
@@ -163,7 +163,10 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(Assign assignStat) {
-        return "";
+        String result = assignStat.getRvalue().accept(this) + '\n';
+        result += assignStat.getLvalue().accept(this) + "\n";
+        result += JGenrator.storeVal(assignStat.getLvalue()) + "\n";
+        return result;
     }
 
     @Override
@@ -222,10 +225,11 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(LocalVarsDefinitions localVarsDefinitions) {
+        StringBuilder result = new StringBuilder();
         for (LocalVarDef lvd : localVarsDefinitions.getVarDefinitions()) {
-            lvd.accept(this);
+            result.append(lvd.accept(this));
         }
-        return "";
+        return result.toString();
     }
 
     @Override
@@ -235,6 +239,8 @@ public class JasminCompiler extends Visitor<String> {
 
     @Override
     public String visit(DecStatement decStatement) {
+        String result = "";
+
         return "";
     }
 
