@@ -30,6 +30,8 @@ import java.text.MessageFormat;
 import static java.text.MessageFormat.format;
 
 public class JasminCompiler extends Visitor<String> {
+    private static final int STACK_SIZE = 64;
+    private static final int LOCALS_SIZE = 64;
     private ExpressionTypeExtractor expressionTypeExtractor;
     private MethodDeclaration currentMethod;
     private Graph<String> classHierarchy;
@@ -247,9 +249,13 @@ public class JasminCompiler extends Visitor<String> {
         SymbolTable.pushFromQueue();
         expressionTypeExtractor.setCurrentClass(classDeclaration);
 
-        for (ClassMemberDeclaration cmd : classDeclaration.getClassMembers()) {
-            result.append(cmd.accept(this));
-        }
+        for (ClassMemberDeclaration cmd : classDeclaration.getClassMembers())
+            if (cmd instanceof FieldDeclaration)
+                result.append(cmd.accept(this));
+        for (ClassMemberDeclaration cmd : classDeclaration.getClassMembers())
+            if (cmd instanceof MethodDeclaration)
+                result.append(cmd.accept(this));
+
         SymbolTable.pop();
         result.append(JGenrator.comment(format("end of class {0}", classDeclaration.getName().getName())));
         return String.valueOf(result);
@@ -268,21 +274,27 @@ public class JasminCompiler extends Visitor<String> {
     @Override
     public String visit(ParameterDeclaration parameterDeclaration) {
         SymbolTable.define();
-        return "";
+        return JGenrator.genType(parameterDeclaration.getType());
     }
 
     @Override
-    public String visit(MethodDeclaration methodDeclaration) {
+    public String visit(MethodDeclaration mD) {
+        StringBuilder result = new StringBuilder(format(".method {1} {0}(", mD.getName().getName(), mD.getAccessModifier()));
         SymbolTable.reset();
         SymbolTable.pushFromQueue();
-        currentMethod = methodDeclaration;
-        for(ParameterDeclaration parameter : methodDeclaration.getArgs() )
-            parameter.accept( this);
-        for (Statement s : methodDeclaration.getBody()) {
-            s.accept(this);
+        currentMethod = mD;
+        for(ParameterDeclaration parameter : mD.getArgs() )
+            result.append(parameter.accept(this));
+        result.append(format("){0}\n", JGenrator.genType(mD.getReturnType())));
+        result.append(format(".limit stack {0}\n", STACK_SIZE));
+        result.append(format(".limit locals {0}\n", LOCALS_SIZE));
+
+        for (Statement s : mD.getBody()) {
+            result.append(s.accept(this));
         }
         SymbolTable.pop();
-        return "";
+        result.append(".end\n");
+        return result.toString();
     }
 
     @Override
