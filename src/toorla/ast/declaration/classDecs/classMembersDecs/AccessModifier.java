@@ -5,6 +5,6 @@ public enum AccessModifier {
     @Override
     public String toString()
     {
-       return "(" + super.toString() + ")";
+       return name().substring(16).toLowerCase();
     }
 }

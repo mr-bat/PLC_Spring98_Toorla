@@ -242,7 +242,7 @@ public class JasminCompiler extends Visitor<String> {
         String parentName = classDeclaration.getParentName().getName() == null ?
                 "java/lang/Object" :
                 classDeclaration.getParentName().getName();
-        result.append(format(".super {0}\n", classDeclaration.getParentName().getName()));
+        result.append(format(".super {0}\n", parentName));
 
         SymbolTable.pushFromQueue();
         expressionTypeExtractor.setCurrentClass(classDeclaration);
@@ -261,8 +261,8 @@ public class JasminCompiler extends Visitor<String> {
     }
 
     @Override
-    public String visit(FieldDeclaration fieldDeclaration) {
-        return "";
+    public String visit(FieldDeclaration fD) {
+        return format(".field {2} {0} {1}\n", fD.getIdentifier().getName(), JGenrator.genType(fD.getType()), fD.getAccessModifier());
     }
 
     @Override
