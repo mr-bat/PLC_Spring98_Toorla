@@ -16,11 +16,11 @@ public class LocalVarDef extends Statement {
     }
 
     public int getIndex() {
-        return index;
+        return localVarName.getIndex();
     }
 
     public void setIndex(int index) {
-        this.index = index;
+        this.localVarName.setIndex(index);
     }
 
     public <R> R accept(IVisitor<R> visitor) {

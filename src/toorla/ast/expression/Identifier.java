@@ -4,6 +4,7 @@ import toorla.visitor.IVisitor;
 
 public class Identifier extends Expression {
     private String name;
+    private int index;
 
     public Identifier(String name) {
         this.name = name;
@@ -11,6 +12,14 @@ public class Identifier extends Expression {
 
     public String getName() {
         return name;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public <R> R accept(IVisitor<R> visitor) {

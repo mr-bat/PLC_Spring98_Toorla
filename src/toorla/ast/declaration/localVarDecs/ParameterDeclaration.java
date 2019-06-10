@@ -14,11 +14,11 @@ public class ParameterDeclaration extends TypedVariableDeclaration {
     }
 
     public int getIndex() {
-        return index;
+        return identifier.getIndex();
     }
 
     public void setIndex(int index) {
-        this.index = index;
+        this.identifier.setIndex(index);
     }
 
     @Override
