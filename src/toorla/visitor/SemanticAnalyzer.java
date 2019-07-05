@@ -33,7 +33,7 @@ public class SemanticAnalyzer implements Visitor<Tree> {
     private SymbolTable classList;
     private SymbolTable currentMethods, currentFields;
     private Integer VarIndex;
-    private boolean showError;
+    private boolean showError, hasError;
 
     private void initializeClassList() {
         classList = new SymbolTable();
@@ -261,11 +261,13 @@ public class SemanticAnalyzer implements Visitor<Tree> {
             identifier.setIndex(VarIndex);
             ++VarIndex;
         } catch (ItemAlreadyExistsException e) {
-            if (showError)
+            if (showError) {
                 System.out.println(MessageFormat.format(
                     "Error:Line:{0}:Redefinition of Local Variable {1} in current scope",
                     identifier.line, identifier.getName()
                 ));
+                hasError = true;
+            }
         }
         localVarDef.getLocalVarName().accept(this);
         localVarDef.getInitialValue().accept(this);
@@ -291,11 +293,13 @@ public class SemanticAnalyzer implements Visitor<Tree> {
         try {
             classList.put(new IdentifierSymbolTableItem(identifier.getName()));
         } catch (ItemAlreadyExistsException e) {
-            if (showError)
+            if (showError) {
                 System.out.println(MessageFormat.format(
                         "Error:Line:{0}:Redefinition of Class {1}",
                         identifier.line, identifier.getName()
                 ));
+                hasError = true;
+            }
         }
     }
 
@@ -341,20 +345,24 @@ public class SemanticAnalyzer implements Visitor<Tree> {
     public Tree visit(FieldDeclaration fieldDeclaration) { // TODO: SHOULD ADD FIELD INDEX?
         Identifier identifier = fieldDeclaration.getIdentifier();
         if (identifier.getName().equals("length")) {
-            if (showError)
+            if (showError) {
                 System.out.println(MessageFormat.format(
                         "Error:Line:{0}:Definition of length as field of a class",
                         identifier.line
                 ));
+                hasError = true;
+            }
         } else {
             try {
                 currentFields.uniquePut(new IdentifierSymbolTableItem(identifier.getName()));
             } catch (ItemAlreadyExistsException e) {
-                if (showError)
+                if (showError) {
                     System.out.println(MessageFormat.format(
                             "Error:Line:{0}:Redefinition of Field {1}",
                             identifier.line, identifier.getName()
                     ));
+                    hasError = true;
+                }
             }
         }
 
@@ -370,11 +378,13 @@ public class SemanticAnalyzer implements Visitor<Tree> {
             identifier.setIndex(VarIndex);
             ++VarIndex;
         } catch (ItemAlreadyExistsException e) {
-            if (showError)
+            if (showError) {
                 System.out.println(MessageFormat.format(
                     "Error:Line:{0}:Redefinition of Local Variable {1} in current scope",
                     identifier.line, identifier.getName()
                 ));
+                hasError = true;
+            }
         }
 
         identifier.accept(this);
@@ -390,11 +400,13 @@ public class SemanticAnalyzer implements Visitor<Tree> {
         try {
             currentFields.uniquePut(new IdentifierSymbolTableItem(identifier.getName()));
         } catch (ItemAlreadyExistsException e) {
-            if (showError)
+            if (showError) {
                 System.out.println(MessageFormat.format(
                         "Error:Line:{0}:Redefinition of Method {1}",
                         identifier.line, identifier.getName()
                 ));
+                hasError = true;
+            }
         }
         methodDeclaration.getName().accept(this);
         for (ParameterDeclaration pd : methodDeclaration.getArgs()) {
@@ -416,6 +428,7 @@ public class SemanticAnalyzer implements Visitor<Tree> {
     @Override
     public Tree visit(Program program) {
         showError = false;
+        hasError = false;
         for (ClassDeclaration ignored : program.getClasses())
             for (ClassDeclaration cd : program.getClasses())
                 cd.accept(this);
@@ -424,6 +437,8 @@ public class SemanticAnalyzer implements Visitor<Tree> {
         showError = true;
         for (ClassDeclaration cd : program.getClasses())
             cd.accept(this);
+        if (hasError)
+            throw new RuntimeException();
         return program;
     }
 }
